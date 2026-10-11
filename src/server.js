@@ -11,6 +11,7 @@ try {
     console.log(`Servidor funcionando en http://localhost:${PORT}`);
   });
 } catch (error) {
-  console.error("No se pudo iniciar el servidor:", error.name);
+  console.error("No se pudo iniciar el servidor:", error);
   process.exit(1);
 }
+
