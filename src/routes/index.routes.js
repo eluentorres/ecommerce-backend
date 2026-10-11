@@ -21,7 +21,21 @@ router.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 router.use("/api/products", uploadRoutes);
 router.use("/api/products", productsRoutes);
+
 router.use("/api/auth", authRoutes);
+
+// Compatibilidad con el frontend React
+// Reutiliza las rutas existentes sin duplicar su lógica.
+router.use("/api/me", (req, res, next) => {
+  req.url = "/me";
+  authRoutes(req, res, next);
+});
+
+router.use("/api/cart/checkout", (req, res, next) => {
+  req.url = "/checkout";
+  ordersRoutes(req, res, next);
+});
+
 router.use("/api", reviewsRoutes);
 router.use("/api/wishlist", wishlistRoutes);
 router.use("/api/admin", adminRoutes);

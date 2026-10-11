@@ -15,7 +15,10 @@ router.get("/", async (req, res, next) => {
       orderBy: { createdAt: "desc" }
     });
 
-    res.json({ ok: true, data: orders });
+    res.json({
+      ok: true,
+      data: orders
+    });
   } catch (error) {
     next(error);
   }
@@ -24,14 +27,16 @@ router.get("/", async (req, res, next) => {
 // Finalizar compra
 router.post("/checkout", async (req, res, next) => {
   try {
-    const result = await prisma.$transaction(async (tx) => {
+    const order = await prisma.$transaction(async (tx) => {
       const cart = await tx.cart.findUnique({
         where: { userId: req.user.id },
         include: { items: true }
       });
 
       if (!cart || cart.items.length === 0) {
-        return { error: "Cart is empty", status: 400 };
+        throw Object.assign(new Error("Cart is empty"), {
+          status: 400
+        });
       }
 
       const orderItems = [];
@@ -43,7 +48,9 @@ router.post("/checkout", async (req, res, next) => {
         });
 
         if (!product) {
-          return { error: "Product not found", status: 404 };
+          throw Object.assign(new Error("Product not found"), {
+            status: 404
+          });
         }
 
         const updated = await tx.product.updateMany({
@@ -57,7 +64,9 @@ router.post("/checkout", async (req, res, next) => {
         });
 
         if (updated.count !== 1) {
-          return { error: "Insufficient stock", status: 400 };
+          throw Object.assign(new Error("Insufficient stock"), {
+            status: 400
+          });
         }
 
         orderItems.push({
@@ -69,32 +78,41 @@ router.post("/checkout", async (req, res, next) => {
         total += product.price * item.quantity;
       }
 
-      const order = await tx.order.create({
+      const createdOrder = await tx.order.create({
         data: {
           userId: req.user.id,
           total: Math.round(total * 100) / 100,
           status: "CONFIRMED",
-          items: { create: orderItems }
+          items: {
+            create: orderItems
+          }
         },
-        include: { items: true }
+        include: {
+          items: true
+        }
       });
 
       await tx.cartItem.deleteMany({
         where: { cartId: cart.id }
       });
 
-      return { order };
+      return createdOrder;
     });
 
-    if (result.error) {
-      return res.status(result.status).json({
+    return res.status(201).json({
+      ok: true,
+      data: order
+    });
+  } catch (error) {
+    if (error.status === 400 || error.status === 404) {
+      return res.status(error.status).json({
         ok: false,
-        error: { message: result.error }
+        error: {
+          message: error.message
+        }
       });
     }
 
-    res.status(201).json({ ok: true, data: result.order });
-  } catch (error) {
     next(error);
   }
 });
