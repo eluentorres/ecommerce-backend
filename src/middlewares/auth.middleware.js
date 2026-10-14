@@ -1,18 +1,23 @@
-﻿import jwt from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import prisma from "../config/prismaClient.js";
 
 export async function requireAuth(req, res, next) {
   try {
     const authorization = req.headers.authorization;
 
-    if (!authorization?.startsWith("Bearer ")) {
+    const bearerToken = authorization?.startsWith("Bearer ")
+      ? authorization.slice(7)
+      : null;
+
+    const token = req.cookies?.nova_token || bearerToken;
+
+    if (!token) {
       return res.status(401).json({
         ok: false,
         error: { message: "Authentication required" }
       });
     }
 
-    const token = authorization.slice(7);
     const payload = jwt.verify(token, process.env.JWT_SECRET);
 
     const user = await prisma.user.findUnique({

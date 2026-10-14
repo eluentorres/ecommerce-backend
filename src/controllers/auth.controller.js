@@ -1,4 +1,4 @@
-﻿import * as authService from "../services/auth.service.js";
+import * as authService from "../services/auth.service.js";
 
 export async function register(req, res, next) {
   try {
@@ -48,6 +48,16 @@ export async function login(req, res, next) {
     }
 
     const result = await authService.login({ email, password });
+
+    const isProduction = process.env.NODE_ENV === "production";
+
+    res.cookie("nova_token", result.token, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000,
+      path: "/"
+    });
 
     res.json({
       ok: true,

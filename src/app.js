@@ -1,6 +1,7 @@
-﻿import express from "express";
+import express from "express";
 import helmet from "helmet";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import routes from "./routes/index.routes.js";
 
@@ -9,8 +10,11 @@ const app = express();
 // Cabeceras de seguridad
 app.use(helmet());
 
-// Permitir peticiones desde otros orígenes
-app.use(cors());
+// Permitir peticiones desde otros orÃ­genes
+app.use(cors({
+  origin: process.env.FRONTEND_URL || "http://localhost:5173",
+  credentials: true
+}));
 
 // Limitar peticiones para evitar abusos
 app.use(rateLimit({
@@ -20,6 +24,7 @@ app.use(rateLimit({
   legacyHeaders: false
 }));
 
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
