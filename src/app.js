@@ -10,7 +10,7 @@ const app = express();
 // Cabeceras de seguridad
 app.use(helmet());
 
-// Permitir peticiones desde otros orÃ­genes
+// Permitir peticiones desde otros orÃƒÂ­genes
 app.use(cors({
   origin: process.env.FRONTEND_URL || "http://localhost:5173",
   credentials: true
@@ -28,6 +28,30 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use((req, res, next) => {
+  const safeMethods = ["GET", "HEAD", "OPTIONS"];
+
+  if (safeMethods.includes(req.method)) {
+    return next();
+  }
+
+  // Solo exigimos comprobar el origen cuando se envía la cookie de sesión.
+  if (!req.cookies?.nova_token) {
+    return next();
+  }
+
+  const allowedOrigin = process.env.FRONTEND_URL || "http://localhost:5173";
+  const origin = req.get("Origin");
+
+  if (origin !== allowedOrigin) {
+    return res.status(403).json({
+      ok: false,
+      error: { message: "Origin not allowed" }
+    });
+  }
+
+  next();
+});
 app.use(routes);
 
 // Ruta no encontrada
