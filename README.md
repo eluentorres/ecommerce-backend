@@ -1,4 +1,4 @@
-# Ecommerce Backend
+﻿# Ecommerce Backend
 
 API REST de comercio electrónico desarrollada con Node.js y Express, preparada para conectarse a un frontend React.
 
@@ -72,7 +72,7 @@ No publicar contraseñas ni claves privadas.
 | GET | `/api/orders` | Consultar pedidos |
 | POST | `/api/orders/checkout` | Finalizar compra |
 
-Los endpoints protegidos utilizan la cabecera `Authorization: Bearer TOKEN`.
+La autenticacion del frontend utiliza una cookie HTTP-only. El backend tambien admite Bearer Token en las rutas protegidas.
 
 ## Pruebas automatizadas
 
@@ -86,10 +86,10 @@ Ejecutar:
 https://github.com/eluentorres/ecommerce-backend
 
 **Backend en Render:**  
-https://ecommerce-backend-50sl.onrender.com
+https://nova2040-backend.onrender.com
 
 **Documentación Swagger:**  
-https://ecommerce-backend-50sl.onrender.com/api/docs
+https://nova2040-backend.onrender.com/api/docs
 
 **Estado del servidor:**  
-https://ecommerce-backend-50sl.onrender.com/health
+https://nova2040-backend.onrender.com/health
