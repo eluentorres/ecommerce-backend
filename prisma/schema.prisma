@@ -50,6 +50,7 @@ model CartItem {
 }
 
 model Order {
+  stripeSessionId String? @unique
   id         String      @id @default(cuid())
   userId     String
   total      Float

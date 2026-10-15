@@ -9,6 +9,7 @@ import wishlistRoutes from "./wishlist.routes.js";
 import adminRoutes from "./admin.routes.js";
 import cartRoutes from "./cart.routes.js";
 import ordersRoutes from "./orders.routes.js";
+import stripeRoutes from "./stripe.routes.js";
 import uploadRoutes from "./upload.routes.js";
 
 const router = Router();
@@ -41,5 +42,6 @@ router.use("/api/wishlist", wishlistRoutes);
 router.use("/api/admin", adminRoutes);
 router.use("/api/cart", cartRoutes);
 router.use("/api/orders", ordersRoutes);
+router.use("/api/stripe", stripeRoutes);
 
 export default router;

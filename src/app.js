@@ -4,13 +4,14 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import routes from "./routes/index.routes.js";
+import stripeWebhookRoutes from "./routes/stripeWebhook.routes.js";
 
 const app = express();
 
 // Cabeceras de seguridad
 app.use(helmet());
 
-// Permitir peticiones desde otros orÃƒÂ­genes
+// Permitir peticiones desde otros orÃƒÆ’Ã‚Â­genes
 app.use(cors({
   origin: process.env.FRONTEND_URL || "http://localhost:5173",
   credentials: true
@@ -24,6 +25,7 @@ app.use(rateLimit({
   legacyHeaders: false
 }));
 
+app.use("/api/stripe", stripeWebhookRoutes);
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -35,7 +37,7 @@ app.use((req, res, next) => {
     return next();
   }
 
-  // Solo exigimos comprobar el origen cuando se envía la cookie de sesión.
+  // Solo exigimos comprobar el origen cuando se envÃ­a la cookie de sesiÃ³n.
   if (!req.cookies?.nova_token) {
     return next();
   }
